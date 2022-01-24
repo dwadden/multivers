@@ -19,7 +19,19 @@ pip install -r requirements.txt
 
 ## Running inference with pre-trained models
 
+- First, download the processed versions of the data by running `bash script/get_data.sh`. This will put the data in `data`.
+- Then, download the model checkpoint you'd like using `bash script/get_checkpoint.sh [checkpoint_name]`. Available models are listed in [model checkpoints](#model-checkpoints) section.
+-
 
 
+## Model checkpoints
 
-## Pre-trained models
+The following model checkpoints are available. You can download them using the `script/get_checkpoint.sh`.
+
+- `fever`: LongChecker trained on [FEVER](https://fever.ai/).
+- `fever_sci`: LongChecker trained on FEVER, plus two weakly-supervised scientific datasets: [PubMedQA](https://pubmedqa.github.io/) and [Evidence Inference](https://evidence-inference.ebm-nlp.com/).
+- `covidfact`: Finetuned on [CovidFact](https://github.com/asaakyan/covidfact), starting from the `fever_sci` checkpoint.
+- `healthver`: Finetuned on [HealthVer](https://github.com/sarrouti/HealthVer).
+- `scifact`: Finetuned on [SciFact](https://github.com/allenai/scifact).
+
+You can also download all models by passing `all` to `get_checkpoint.sh`.
