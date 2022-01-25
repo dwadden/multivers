@@ -8,48 +8,17 @@ from torch import nn
 from torch.nn import functional as F
 import transformers
 from transformers.optimization import get_linear_schedule_with_warmup
-from lib.longformer.metrics import SciFactMetrics
 from pytorch_lightning.core.decorators import auto_move_data
 
 from transformers import LongformerModel
 
-from lib.longformer.allennlp_nn_util import batched_index_select
-from lib.longformer.allennlp_feedforward import FeedForward
+from allennlp_nn_util import batched_index_select
+from allennlp_feedforward import FeedForward
 
-from lib import util
-
-# TODO(dwadden) double-check this is correct.
-def masked_binary_cross_entropy_with_logits(input, target, weight, rationale_mask):
-    """
-    Binary cross entropy loss. Ignore values where the target is -1. Compute
-    loss as a "mean of means", first taking the mean over the sentences in each
-    row, and then over all the rows.
-    """
-    # Mask to indicate which values contribute to loss.
-    mask = torch.where(target > -1, 1, 0)
-
-    # Need to convert target to float, and set -1 values to 0 in order for the
-    # computation to make sense. We'll ignore the -1 values later.
-    float_target = target.clone().to(torch.float)
-    float_target[float_target == -1] = 0
-    losses = F.binary_cross_entropy_with_logits(
-        input, float_target, reduction="none")
-    # Mask out the values that don't matter.
-    losses = losses * mask
-
-    # Take "sum of means" over the sentence-level losses for each instance.
-    # Take means so that long documents don't dominate.
-    # Multiply by `rationale_mask` to ignore sentences where we don't have
-    # rationale annotations.
-    n_sents = mask.sum(dim=1)
-    totals = losses.sum(dim=1)
-    means = totals / n_sents
-    final_loss = (means * weight * rationale_mask).sum()
-
-    return final_loss
+import util
 
 
-class SciFactModel(pl.LightningModule):
+class LongCheckerModel(pl.LightningModule):
     """
     Multi-task SciFact model that encodes claim / abstract pairs using
     Longformer and then predicts rationales and labels in a multi-task fashion.
