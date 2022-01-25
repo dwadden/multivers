@@ -9,12 +9,23 @@ import subprocess
 
 def get_model(name):
     url = f"https://scifact.s3.us-west-2.amazonaws.com/longchecker/latest/checkpoints/{name}.ckpt"
-    cmd = ["wget", "-O", f"checkpoints/{name}.ckpt", url]
-    subprocess.run(cmd)
+    out_file = f"checkpoints/{name}.ckpt"
+    cmd = ["wget", "-O", out_file, url]
+
+    if not pathlib.Path(out_file).exists():
+        subprocess.run(cmd)
 
 
 def main():
-    choices = ["all", "covidfact", "fever_sci", "fever", "healthver", "scifact"]
+    choices = [
+        "all",
+        "covidfact",
+        "fever_sci",
+        "fever",
+        "healthver",
+        "scifact",
+        "longformer_large_science",
+    ]
     parser = argparse.ArgumentParser(
         description="Download pretrained Longchecker model"
     )

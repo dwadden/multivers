@@ -4,6 +4,8 @@ Shared utility functions.
 
 import json
 import numpy as np
+import pathlib
+import os
 
 
 def load_jsonl(fname, max_lines=None):
@@ -33,3 +35,10 @@ def write_jsonl(data, fname):
     with open(fname, "w") as f:
         for line in data:
             print(json.dumps(line, cls=NPEncoder), file=f)
+
+
+def get_longformer_science_checkpoint():
+    current_dir = pathlib.Path(os.path.realpath(__file__)).parent
+    fname = current_dir.parent / "checkpoints/longformer_large_science.ckpt"
+
+    return str(fname)

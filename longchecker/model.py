@@ -14,6 +14,7 @@ from transformers import LongformerModel
 
 from allennlp_nn_util import batched_index_select
 from allennlp_feedforward import FeedForward
+from metrics import SciFactMetrics
 
 import util
 
@@ -113,13 +114,6 @@ class LongCheckerModel(pl.LightningModule):
     @staticmethod
     def _get_encoder(hparams):
         "If we're using Arman's science checkpoint, need to do some tweaks."
-        # If we're not using the science model, just return the checkpoint.
-        if hparams.encoder_name != "longformer-large-science":
-            encoder = LongformerModel.from_pretrained(
-                hparams.encoder_name,
-                gradient_checkpointing=hparams.gradient_checkpointing)
-            return encoder
-
         # Otherwise, we're using Arman's checkpoint.
         starting_encoder_name = "allenai/longformer-large-4096"
         encoder = LongformerModel.from_pretrained(
@@ -128,7 +122,7 @@ class LongCheckerModel(pl.LightningModule):
 
         # Else, need to do some cleanup.
         orig_state_dict = encoder.state_dict()
-        checkpoint_prefixed = torch.load(util.longformer_science_checkpoint)
+        checkpoint_prefixed = torch.load(util.get_longformer_science_checkpoint())
 
         # New checkpoint
         new_state_dict = {}
