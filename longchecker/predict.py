@@ -15,6 +15,7 @@ def get_args():
     parser.add_argument("--output_file", type=str)
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--device", default=0, type=int)
+    parser.add_argument("--num_workers", default=4, type=int)
     parser.add_argument(
         "--no_nei", action="store_true", help="If given, never predict NEI."
     )
@@ -49,7 +50,7 @@ def get_predictions(args):
         if hasattr(hparams, k):
             setattr(hparams, k, v)
 
-    dataloader = get_dataloader(args, hparams)
+    dataloader = get_dataloader(args)
 
     # Make predictions.
     predictions_all = []

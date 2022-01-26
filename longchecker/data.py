@@ -107,7 +107,7 @@ class LongCheckerReader:
     """
     def __init__(self, predict_args):
         self.data_file = predict_args.input_file
-        self.corpus_file = predict_args.scifact_corpus_file
+        self.corpus_file = predict_args.corpus_file
         # Basically, I used two different sets of labels. This was dumb, but
         # doing this mapping fixes it.
         self.label_map = {"SUPPORT": "SUPPORTS",
@@ -122,12 +122,6 @@ class LongCheckerReader:
         corpus = util.load_jsonl(self.corpus_file)
         corpus_dict = {x["doc_id"]: x for x in corpus}
         claims = util.load_jsonl(self.data_file)
-        retrievals = util.load_jsonl(self.retrieval_file)
-
-        # Check that the claims and retrievals match up.
-        claim_ids = [claim["id"] for claim in claims]
-        retrieval_ids = [retrieval["claim_id"] for retrieval in retrievals]
-        assert claim_ids == retrieval_ids
 
         for claim in claims:
             for doc_id in claim["doc_ids"]:
@@ -158,6 +152,7 @@ class Collator:
             "tokenized": self._pad_tokenized([x["tokenized"] for x in batch]),
             "abstract_sent_idx": self._pad_field(batch, "abstract_sent_idx", 0),
         }
+
         # Make sure the keys match.
         assert res.keys() == batch[0].keys()
         return res
@@ -201,14 +196,14 @@ class Collator:
         return torch.tensor(res)
 
 
-def get_dataloader(predict_args, model_hparams):
+def get_dataloader(predict_args):
     "Main entry point to get the data loader. This can only be used at test time."
     reader = LongCheckerReader(predict_args)
-    tokenizer = get_tokenizer(model_hparams)
+    tokenizer = get_tokenizer()
     ds = reader.get_data(tokenizer)
     collator = Collator(tokenizer)
     return DataLoader(ds,
-                      num_workers=model_hparams.num_workers,
+                      num_workers=predict_args.num_workers,
                       batch_size=predict_args.batch_size,
                       collate_fn=collator,
                       shuffle=False,

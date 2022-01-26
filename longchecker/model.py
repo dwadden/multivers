@@ -19,6 +19,36 @@ from metrics import SciFactMetrics
 import util
 
 
+def masked_binary_cross_entropy_with_logits(input, target, weight, rationale_mask):
+    """
+    Binary cross entropy loss. Ignore values where the target is -1. Compute
+    loss as a "mean of means", first taking the mean over the sentences in each
+    row, and then over all the rows.
+    """
+    # Mask to indicate which values contribute to loss.
+    mask = torch.where(target > -1, 1, 0)
+
+    # Need to convert target to float, and set -1 values to 0 in order for the
+    # computation to make sense. We'll ignore the -1 values later.
+    float_target = target.clone().to(torch.float)
+    float_target[float_target == -1] = 0
+    losses = F.binary_cross_entropy_with_logits(
+        input, float_target, reduction="none")
+    # Mask out the values that don't matter.
+    losses = losses * mask
+
+    # Take "sum of means" over the sentence-level losses for each instance.
+    # Take means so that long documents don't dominate.
+    # Multiply by `rationale_mask` to ignore sentences where we don't have
+    # rationale annotations.
+    n_sents = mask.sum(dim=1)
+    totals = losses.sum(dim=1)
+    means = totals / n_sents
+    final_loss = (means * weight * rationale_mask).sum()
+
+    return final_loss
+
+
 class LongCheckerModel(pl.LightningModule):
     """
     Multi-task SciFact model that encodes claim / abstract pairs using
@@ -113,14 +143,12 @@ class LongCheckerModel(pl.LightningModule):
 
     @staticmethod
     def _get_encoder(hparams):
-        "If we're using Arman's science checkpoint, need to do some tweaks."
-        # Otherwise, we're using Arman's checkpoint.
+        "Start from the Longformer science checkpoint."
         starting_encoder_name = "allenai/longformer-large-4096"
         encoder = LongformerModel.from_pretrained(
             starting_encoder_name,
             gradient_checkpointing=hparams.gradient_checkpointing)
 
-        # Else, need to do some cleanup.
         orig_state_dict = encoder.state_dict()
         checkpoint_prefixed = torch.load(util.get_longformer_science_checkpoint())
 
@@ -335,7 +363,8 @@ class LongCheckerModel(pl.LightningModule):
         for this_instance, this_output in zip(instances, output_unbatched):
             predicted_label = label_lookup[this_output["predicted_labels"]]
 
-            rationale_ix = this_instance["rationale"] > -1
+            # Due to minibatching, may need to get rid of padding sentences.
+            rationale_ix = this_instance["abstract_sent_idx"] > 0
             rationale_indicators = this_output["predicted_rationales"][rationale_ix]
             predicted_rationale = rationale_indicators.nonzero()[0].tolist()
             # Need to convert from numpy data type to native python.
