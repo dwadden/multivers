@@ -2,7 +2,7 @@
 
 This is the repository for the LongChecker model for scientific claim verification, described in the arXiv preprint [LongChecker: Improving scientific claim verification by modeling full-abstract context](https://arxiv.org/abs/2112.01640).
 
-**Repository status**: We provide data, model checkpoints, and inference code for models trained on three scientific claim verification datasets: [SciFact](https://github.com/allenai/scifact), CovidFact](https://github.com/asaakyan/covidfact), and [HealthVer](https://github.com/sarrouti/HealthVer) (see below for details).
+**Repository status**: We provide data, model checkpoints, and inference code for models trained on three scientific claim verification datasets: [SciFact](https://github.com/allenai/scifact), [CovidFact](https://github.com/asaakyan/covidfact), and [HealthVer](https://github.com/sarrouti/HealthVer) (see below for details).
 
 While the SciFact test set is not public, predictions made using the SciFact checkpoint will reproduce the results in the preprint and on the [SciFact leaderboard](https://leaderboard.allenai.org/scifact/submissions/public).
 
