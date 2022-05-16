@@ -15,11 +15,13 @@ We're in the process of getting the model training code cleaned up for release, 
 ## Setup
 
 We recommend setting up a Conda environment:
+
 ```bash
 conda create --name multivers python=3.8 conda-build
 ```
 
 Then, install required packages:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -27,6 +29,7 @@ pip install -r requirements.txt
 Next, clone this repo.
 
 Then, download the Longformer checkpoint from which all the fact-checking models are finetuned by doing
+
 ```bash
 python script/get_checkpoint.py longformer_large_science
 ```
@@ -35,16 +38,19 @@ python script/get_checkpoint.py longformer_large_science
 
 - First, download the processed versions of the data by running `bash script/get_data.sh`. This will download the CovidFact, HealthVer, and SciFact datasets into the `data` directory.
 - Then, download the model checkpoint you'd like to make predictions with using
+
   ```bash
   python script/get_checkpoint.py [checkpoint_name]
   ```
+
   Available models are listed in [model checkpoints](#model-checkpoints) section.
 - Make predictions using the convenience wrapper script [script/predict.sh](script/predict.sh). This script accepts a dataset name as an argument, and makes predictions using the correct inputs files and model checkpoints for that dataset. For instance, to make predictions on the SciFact test set using the version of MultiVerS trained on Scifact, do:
+
   ```bash
   bash script/predict.sh scifact
   ```
-- For more control over the models and datasets used for prediction, you can use [longchecker/predict.py](longchecker/predict.py).
 
+- For more control over the models and datasets used for prediction, you can use [longchecker/predict.py](longchecker/predict.py).
 
 ## Model checkpoints
 
