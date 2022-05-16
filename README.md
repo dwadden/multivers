@@ -1,6 +1,8 @@
-# The Longchecker model
+# The MultiVerS model
 
-This is the repository for the LongChecker model for scientific claim verification, described in the arXiv preprint [LongChecker: Improving scientific claim verification by modeling full-abstract context](https://arxiv.org/abs/2112.01640).
+This is the repository for the MultiVerS model for scientific claim verification, described in the NAACL Findings 2022 paper [MultiVerS: Improving scientific claim verification with weak supervision and full-document context](https://arxiv.org/abs/2112.01640).
+
+MultiVers was formerly known as LongChecker. It's the exact same model; we just changed the name to emphasize different aspects of the modeling approach. I'm still in the process of changing the filenames within this repo.
 
 **Repository status**: We provide data, model checkpoints, and inference code for models trained on three scientific claim verification datasets: [SciFact](https://github.com/allenai/scifact), [CovidFact](https://github.com/asaakyan/covidfact), and [HealthVer](https://github.com/sarrouti/HealthVer) (see below for details).
 
@@ -8,11 +10,13 @@ While the SciFact test set is not public, predictions made using the SciFact che
 
 We're in the process of getting the model training code cleaned up for release, and will update the repo when it's ready.
 
+**Disclaimer**: This software is intended to be used as a research protype, and its outputs shouldn't be used to inform any medical decisions.
+
 ## Setup
 
 We recommend setting up a Conda environment:
 ```bash
-conda create --name longchecker python=3.8 conda-build
+conda create --name multivers python=3.8 conda-build
 ```
 
 Then, install required packages:
@@ -35,7 +39,7 @@ python script/get_checkpoint.py longformer_large_science
   python script/get_checkpoint.py [checkpoint_name]
   ```
   Available models are listed in [model checkpoints](#model-checkpoints) section.
-- Make predictions using the convenience wrapper script [script/predict.sh](script/predict.sh). This script accepts a dataset name as an argument, and makes predictions using the correct inputs files and model checkpoints for that dataset. For instance, to make predictions on the SciFact test set using the version of LongChecker trained on Scifact, do:
+- Make predictions using the convenience wrapper script [script/predict.sh](script/predict.sh). This script accepts a dataset name as an argument, and makes predictions using the correct inputs files and model checkpoints for that dataset. For instance, to make predictions on the SciFact test set using the version of MultiVerS trained on Scifact, do:
   ```bash
   bash script/predict.sh scifact
   ```
@@ -46,8 +50,8 @@ python script/get_checkpoint.py longformer_large_science
 
 The following model checkpoints are available. You can download them using `script/get_checkpoint.sh`.
 
-- `fever`: LongChecker trained on [FEVER](https://fever.ai/).
-- `fever_sci`: LongChecker trained on FEVER, plus two weakly-supervised scientific datasets: [PubMedQA](https://pubmedqa.github.io/) and [Evidence Inference](https://evidence-inference.ebm-nlp.com/).
+- `fever`: MultiVerS trained on [FEVER](https://fever.ai/).
+- `fever_sci`: MultiVerS trained on FEVER, plus two weakly-supervised scientific datasets: [PubMedQA](https://pubmedqa.github.io/) and [Evidence Inference](https://evidence-inference.ebm-nlp.com/).
 - `covidfact`: Finetuned on [CovidFact](https://github.com/asaakyan/covidfact), starting from the `fever_sci` checkpoint.
 - `healthver`: Finetuned on [HealthVer](https://github.com/sarrouti/HealthVer).
 - `scifact`: Finetuned on [SciFact](https://github.com/allenai/scifact).
