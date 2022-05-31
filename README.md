@@ -8,7 +8,7 @@ MultiVers was formerly known as LongChecker. It's the exact same model; we just 
 
 While the SciFact test set is not public, predictions made using the SciFact checkpoint will reproduce the results in the preprint and on the [SciFact leaderboard](https://leaderboard.allenai.org/scifact/submissions/public).
 
-We're in the process of getting the model training code cleaned up for release, and will update the repo when it's ready.
+**Update (May 2022)**: Apologies for the delay in getting the training code up. I will make sure that it is available by the time the work is presented at NAACL 2022, if not sooner.
 
 **Disclaimer**: This software is intended to be used as a research protype, and its outputs shouldn't be used to inform any medical decisions.
 
