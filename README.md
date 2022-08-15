@@ -12,6 +12,14 @@ While the SciFact test set is not public, predictions made using the SciFact che
 
 **Disclaimer**: This software is intended to be used as a research protype, and its outputs shouldn't be used to inform any medical decisions.
 
+## Outline
+
+- [Setup](#setup)
+- [Running inference](#running-inference)
+- [Model checkpoints](#model-checkpoints)
+- [Evaluating predictions](#evaluating-predictions)
+- [Making predictions for new datasets](#making-predictions-for-new-datasets)
+
 ## Setup
 
 We recommend setting up a Conda environment:
@@ -26,7 +34,7 @@ Then, install required packages:
 pip install -r requirements.txt
 ```
 
-Next, clone this repo.
+Next, call `conda develop .` from the root of this repository.
 
 Then, download the Longformer checkpoint from which all the fact-checking models are finetuned by doing
 
@@ -34,7 +42,7 @@ Then, download the Longformer checkpoint from which all the fact-checking models
 python script/get_checkpoint.py longformer_large_science
 ```
 
-## Running inference with model checkpoints
+## Running inference
 
 - First, download the processed versions of the data by running `bash script/get_data.sh`. This will download the CovidFact, HealthVer, and SciFact datasets into the `data` directory.
 - Then, download the model checkpoint you'd like to make predictions with using
@@ -65,7 +73,7 @@ The following model checkpoints are available. You can download them using `scri
 
 You can also download all models by passing `all` to `get_checkpoint.sh`.
 
-## Evaluating model predictions
+## Evaluating predictions
 
 The SciFact test set is private, but the test sets for HealthVer and CovidFact are included in the data download. To evaluate model predictions, use the [scifact-evaluator](https://github.com/allenai/scifact-evaluator) code. Clone the repo, then use the [evaluation script](https://github.com/allenai/scifact-evaluator/blob/master/evaluator/eval.py) located at `evaluator/eval.py`. This script accepts two files:
 
@@ -73,3 +81,21 @@ The SciFact test set is private, but the test sets for HealthVer and CovidFact a
 2. Gold labels, which are included in the data download.
 
 It will evaluate the predictions with respect to gold and save metrics to a file. See the evaluation script for more details.
+
+## Making predictions for new datasets
+
+You should be able to use one of the MultiVers checkpoints to make predictions for new data. First, you'll need to write a script to convert your dataset to the format described in [data.md](doc/data.md). Then, choose which model you'd like to use. If you don't know which one is best, we'd suggest:
+
+- `fever` for Wikipedia or general text.
+- `healthver` for claims specifically about COVID-19.
+- `scifact` for biomedical claims generally.
+
+Once you've got your model and dataset chosen, you can make predictions as follows:
+
+```bash
+    python longchecker/predict.py \
+        --checkpoint_path=checkpoints/[model_name].ckpt \
+        --input_file=[path_to_your_claims] \
+        --corpus_file=[path_to_your_corpus] \
+        --output_file=[output_path]
+```
