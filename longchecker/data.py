@@ -1,3 +1,7 @@
+"""
+Module to handle data for inference.
+"""
+
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer

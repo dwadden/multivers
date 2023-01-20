@@ -1,3 +1,9 @@
+"""
+Module to handle training data.
+
+If you're just doing inference, look at `data.py` instead of this file.
+"""
+
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
@@ -10,7 +16,7 @@ import random
 
 from pytorch_lightning import LightningDataModule
 
-from verisci.evaluate.lib.data import GoldDataset
+from data_verisci import GoldDataset
 from transformers import AutoTokenizer, BatchEncoding
 
 from lib import util
