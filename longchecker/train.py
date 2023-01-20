@@ -10,8 +10,8 @@ from pytorch_lightning import callbacks
 from pytorch_lightning.plugins import DDPPlugin
 import argparse
 
-import lib.longformer.data as dm
-from lib.longformer.model import SciFactModel
+import data_train as dm
+from model import SciFactModel
 
 
 def get_timestamp():
