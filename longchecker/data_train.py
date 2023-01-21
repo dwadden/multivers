@@ -295,7 +295,9 @@ class SciFactDataset(Dataset):
 class FactCheckingReader:
     def __init__(self, debug=False):
         self.debug = debug
-        self.data_root = pathlib.Path(os.path.realpath(__file__)).parent.parent / "data_train"
+        self.data_root = (
+            pathlib.Path(os.path.realpath(__file__)).parent.parent / "data_train"
+        )
 
 
 class SciFactReader(FactCheckingReader):
@@ -370,6 +372,7 @@ class SciFactReader(FactCheckingReader):
 
 class SciFact10Reader(SciFactReader):
     "SciFact train data with 10 negative samples per positive."
+
     def __init__(self, *args, **kwargs):
         self.data_dir = self.data_root / "target/scifact_10"
         super().__init__(*args, **kwargs)
@@ -377,6 +380,7 @@ class SciFact10Reader(SciFactReader):
 
 class SciFact20Reader(SciFactReader):
     "SciFact train data with 20 negative samples per positive."
+
     def __init__(self, *args, **kwargs):
         self.data_dir = self.data_root / "target/scifact_20"
         super().__init__(*args, **kwargs)
