@@ -99,3 +99,8 @@ Once you've got your model and dataset chosen, you can make predictions as follo
         --corpus_file=[path_to_your_corpus] \
         --output_file=[output_path]
 ```
+
+
+## Model training
+
+For details on training the model, see TODO.

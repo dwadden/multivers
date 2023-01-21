@@ -79,3 +79,10 @@ def unbatch(d, ignore=[]):
         res.append(to_append)
 
     return res
+
+
+def flatten(z):
+    """
+    Flatten a nested list.
+    """
+    return [x for y in z for x in y]
