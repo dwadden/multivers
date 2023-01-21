@@ -4,10 +4,11 @@ Module to handle training data.
 If you're just doing inference, look at `data.py` instead of this file.
 """
 
+import os
+import pathlib
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-from pathlib import Path
 from argparse import ArgumentParser
 import pandas as pd
 import numpy as np
@@ -19,10 +20,7 @@ from pytorch_lightning import LightningDataModule
 from data_verisci import GoldDataset
 from transformers import AutoTokenizer, BatchEncoding
 
-from lib import util
-
-
-# Helper functions
+import util
 
 
 def get_tokenizer(hparams):
@@ -295,25 +293,21 @@ class SciFactDataset(Dataset):
 
 
 class FactCheckingReader:
-    def __init__(self, debug=False, negative_samples=0):
+    def __init__(self, debug=False):
         self.debug = debug
-        self.negative_samples = negative_samples
-        self.negative_sample_root = (
-            util.data_dir / "negative_samples/claims_fewer_negatives_final"
-        )
+        self.data_root = pathlib.Path(os.path.realpath(__file__)).parent.parent / "data_train"
 
 
 class SciFactReader(FactCheckingReader):
     """
-    Class to handle SciFact data.
+    Class to handle SciFact data. Not used directly; its subclasses handle cases with
+    different numbers of negative samples.
     """
 
-    def __init__(self, n_train, data_dir, fewshot, *args, **kwargs):
+    def __init__(self, fewshot, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_dir = Path(data_dir)
         self.name = "SciFact"
         self.rationale_mask = 1.0
-        self.n_train = n_train
         self.fewshot = fewshot
 
     def get_fold(self, fold, tokenizer):
@@ -374,13 +368,27 @@ class SciFactReader(FactCheckingReader):
         return SciFactDataset(res, tokenizer, self.name, self.rationale_mask)
 
 
+class SciFact10Reader(SciFactReader):
+    "SciFact train data with 10 negative samples per positive."
+    def __init__(self, *args, **kwargs):
+        self.data_dir = self.data_root / "target/scifact_10"
+        super().__init__(*args, **kwargs)
+
+
+class SciFact20Reader(SciFactReader):
+    "SciFact train data with 20 negative samples per positive."
+    def __init__(self, *args, **kwargs):
+        self.data_dir = self.data_root / "target/scifact_20"
+        super().__init__(*args, **kwargs)
+
+
 class HealthVerReader(SciFactReader):
     """
     HealthVer is formatted the same as SciFact.
     """
 
     def __init__(self, *args, **kwargs):
-        data_dir = util.data_dir / "healthver/processed"
+        data_dir = self.data_root / "target/healthver"
         super().__init__(n_train=None, data_dir=str(data_dir), *args, **kwargs)
         self.name = "HealthVer"
 
@@ -391,7 +399,7 @@ class CovidFactReader(SciFactReader):
     """
 
     def __init__(self, *args, **kwargs):
-        data_dir = util.data_dir / "covid_fact/processed"
+        data_dir = self.data_root / "target/covidfact"
         super().__init__(n_train=None, data_dir=str(data_dir), *args, **kwargs)
         self.name = "CovidFact"
 
@@ -447,7 +455,7 @@ class ExternalReader(FactCheckingReader):
 class FEVERReader(ExternalReader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_dir = self.negative_sample_root / str(self.negative_samples) / "fever"
+        self.data_dir = self.data_root / "pretrain/fever"
         self.name = "FEVER"
         self.rationale_mask = 1.0
 
@@ -455,9 +463,7 @@ class FEVERReader(ExternalReader):
 class PubMedQAReader(ExternalReader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_dir = (
-            self.negative_sample_root / str(self.negative_samples) / "pubmedqa"
-        )
+        self.data_dir = self.data_root / "pretrain/pubmedqa"
         self.name = "PubMedQA"
         self.rationale_mask = 0.0
 
@@ -465,11 +471,7 @@ class PubMedQAReader(ExternalReader):
 class EvidenceInferenceReader(ExternalReader):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_dir = (
-            self.negative_sample_root
-            / str(self.negative_samples)
-            / "evidence_inference"
-        )
+        self.data_dir = self.data_root / "pretrain/evidence_inference"
         self.name = "EvidenceInference"
         self.rationale_mask = 1.0
 
@@ -492,19 +494,13 @@ class ConcatDataModule(LightningDataModule):
         self.max_dataset_weight = hparams.max_dataset_weight
         self.cap_fever_nsamples = hparams.cap_fever_nsamples
         self.debug = hparams.debug or hparams.fast_dev_run
-        self.scifact_n_train = hparams.scifact_n_train
-        # Since negative samples got added later, set to 0 if not given.
-        self.negative_samples = getattr(hparams, "negative_samples", 0)
-        # Ditto for scifact_data_dir
-        self.scifact_data_dir = getattr(
-            hparams, "scifact_data_dir", str(util.scifact_data_dir)
-        )
         # And also for the `fewshot` flag.
         self.fewshot = getattr(hparams, "fewshot", False)
 
         # Get the readers.
         self.reader_lookup = {
-            "scifact": SciFactReader,
+            "scifact_20": SciFact20Reader,
+            "scifact_10": SciFact10Reader,
             "healthver": HealthVerReader,
             "covidfact": CovidFactReader,
             "fever": FEVERReader,
@@ -532,17 +528,7 @@ class ConcatDataModule(LightningDataModule):
         for name in self.dataset_names:
             # For SciFact, keep track of which subset to read.
             this_reader = self.reader_lookup[name]
-            if name == "scifact":
-                reader_args = dict(
-                    n_train=self.scifact_n_train,
-                    data_dir=self.scifact_data_dir,
-                    debug=self.debug,
-                    negative_samples=self.negative_samples,
-                )
-            else:
-                reader_args = dict(
-                    debug=self.debug, negative_samples=self.negative_samples
-                )
+            reader_args = dict(debug=self.debug)
             # If it's a SciFactReader or a subclass, need to pass in whether we're doing
             # fewshot.
             if issubclass(this_reader, SciFactReader):
@@ -581,24 +567,6 @@ class ConcatDataModule(LightningDataModule):
             "--cap_fever_nsamples",
             action="store_true",
             help="If given, make total # samples the same as the size of FEVER.",
-        )
-        parser.add_argument(
-            "--scifact_n_train",
-            type=int,
-            default=809,
-            choices=[200, 400, 600, 809],
-            help="Number of SciFact training examples.",
-        )
-        parser.add_argument(
-            "--negative_samples",
-            type=int,
-            default=0,
-            help="Number of negative samples per positive.",
-        )
-        parser.add_argument(
-            "--scifact_data_dir",
-            default=str(util.scifact_data_dir),
-            help="Path to the SciFact dataset.",
         )
         parser.add_argument(
             "--fewshot",
