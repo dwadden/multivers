@@ -103,4 +103,4 @@ Once you've got your model and dataset chosen, you can make predictions as follo
 
 ## Model training
 
-For details on training the model, see TODO.
+Code is now available to train MultiVerS. See [training.md](doc/training.md) for details.

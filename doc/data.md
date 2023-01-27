@@ -85,7 +85,6 @@ As described in the [claims](#claims) section, each claim must be associated wit
 
 If you have a large corpus that you'd like to verify claims against, but don't know which documents are likely to contain evidence, you'll need to run an information retrieval step to select a list of candidate documents for each claim. A simple approach for this would be to use Skearln's implementation of [TF-IDF](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html). For more advanced retrieval techniques, [pyserini](https://github.com/castorini/pyserini) is a great place to start.
 
-
 ### Splitting documents into sentences
 
 You'll need to format your documents as described in the [corpus](#corpus) section. This requires splitting your body text into sentences. If you're working with scientific text, [scispacy](https://allenai.github.io/scispacy/) provides a good option for this; see example below. For general text (Wikipedia, newswire, etc), you can use [spacy](https://spacy.io/).
