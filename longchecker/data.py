@@ -4,8 +4,9 @@ Module to handle data for inference.
 
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, BatchEncoding
 import torch
+import numpy as np
 
 import util
 
@@ -70,6 +71,65 @@ class LongCheckerDataset(Dataset):
         if title is not None:
             cited_text = title + self.tokenizer.eos_token + cited_text
         tokenized = self.tokenizer(claim + self.tokenizer.eos_token + cited_text)
+        tokenized["global_attention_mask"] = self._get_global_attention_mask(tokenized)
+        abstract_sent_idx = self._get_abstract_sent_tokens(tokenized, title)
+
+        # Make sure we've got the right number of abstract sentence tokens.
+        assert len(abstract_sent_idx) == len(sentences)
+
+        return tokenized, abstract_sent_idx
+
+    def _tokenize_truncated(self, claim, sentences, title):
+        "If we're using RoBERTa, we need to truncate the sentences to fit in window."
+        # Not used in final models, but may be helpful for people trying to train with
+        # different encoders.
+
+        def replace_bos_with_eos(sent):
+            res = [
+                word
+                if word != self.tokenizer.bos_token_id
+                else self.tokenizer.eos_token_id
+                for word in sent
+            ]
+            return res
+
+        # Claim and title aren't truncated.
+        if title is not None:
+            claim_and_title = claim + self.tokenizer.eos_token + title
+        else:
+            claim_and_title = claim
+
+        # Strip off the trailing eos; will get it back when we concatenate the abstract.
+        claim_and_title_tok = self.tokenizer(claim_and_title)["input_ids"][:-1]
+        claim_and_title_len = len(claim_and_title_tok)
+
+        # Need to subtract 1 for the final trailing EOS token.
+        abstract_len = self.tokenizer.model_max_length - claim_and_title_len - 1
+
+        sents = [self.tokenizer(sent)["input_ids"] for sent in sentences]
+        sents = [replace_bos_with_eos(sent) for sent in sents]
+        # Strip off the final eos so we don't duplicate.
+        sents = [sent[:-1] for sent in sents]
+
+        sent_lens = [len(sent) for sent in sents]
+        length_so_far = sum(sent_lens)
+        while length_so_far > abstract_len:
+            longest = np.argmax(sent_lens)
+            sents[longest] = sents[longest][:-1]
+            sent_lens[longest] -= 1
+            length_so_far = sum(sent_lens)
+
+        sents_flat = util.flatten(sents)
+
+        input_ids = claim_and_title_tok + sents_flat + [self.tokenizer.eos_token_id]
+
+        if len(input_ids) > self.tokenizer.model_max_length:
+            raise Exception("Length is wrong.")
+
+        tokenized = BatchEncoding(
+            {"input_ids": input_ids, "attention_mask": [1] * len(input_ids)}
+        )
+        # We don't use this, but setting it keeps the input consistent.
         tokenized["global_attention_mask"] = self._get_global_attention_mask(tokenized)
         abstract_sent_idx = self._get_abstract_sent_tokens(tokenized, title)
 
