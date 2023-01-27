@@ -58,7 +58,14 @@ class LongCheckerDataset(Dataset):
         should be self-explanatory, except `title`. We have abstract titles for
         SciFact, but not FEVER.
         """
-        tokenized, abstract_sent_idx = self._tokenize(claim, sentences, title)
+        if "roberta" in self.tokenizer.name_or_path:
+            tokenized, abstract_sent_idx = self._tokenize_truncated(
+                claim, sentences, title
+            )
+        else:
+            tokenized, abstract_sent_idx = self._tokenize(
+                claim, sentences, title
+            )
 
         # Get the label and the rationales.
         return {
