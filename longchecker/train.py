@@ -11,7 +11,7 @@ from pytorch_lightning.plugins import DDPPlugin
 import argparse
 
 import data_train as dm
-from model import SciFactModel
+from model import LongCheckerModel
 
 
 def get_timestamp():
@@ -37,18 +37,7 @@ def get_folder_names(args):
 
     If a slurm ID is given, just name it by its slurm id.
     """
-    if args.slurm_job_id is None:
-        timestamp = time.time()
-        timezone = pytz.timezone("America/Los_Angeles")
-        dt = datetime.datetime.fromtimestamp(timestamp, timezone)
-        # Seconds past the start of the current day.
-        second_past = 3600 * dt.hour + 60 * dt.minute + dt.second
-        name = dt.strftime("%y_%m_%d_") + str(second_past)
-    else:
-        name = str(args.slurm_job_id)
-
-    if args.experiment_name is not None:
-        name += f"_{args.experiment_name}"
+    name = args.experiment_name
 
     # If the out directory exists, start appending integer suffixes until we
     # find a new one.
@@ -86,12 +75,11 @@ def get_num_training_instances(args):
 def parse_args():
     parser = argparse.ArgumentParser(description="Run SciFact training.")
     parser.add_argument("--datasets", type=str)
-    parser.add_argument("--slurm_job_id", type=int, default=None)
     parser.add_argument("--starting_checkpoint", type=str, default=None)
     parser.add_argument("--monitor", type=str, default="valid_sentence_label_f1")
     parser.add_argument("--result_dir", type=str, default="results/lightning_logs")
     parser.add_argument("--experiment_name", type=str, default=None)
-    parser = SciFactModel.add_model_specific_args(parser)
+    parser = LongCheckerModel.add_model_specific_args(parser)
     parser = dm.ConcatDataModule.add_model_specific_args(parser)
     parser = pl.Trainer.add_argparse_args(parser)
 
@@ -105,17 +93,16 @@ def main():
     pl.seed_everything(76)
 
     args = parse_args()
-
     args.num_training_instances = get_num_training_instances(args)
 
     # Create the model.
     if args.starting_checkpoint is not None:
         # Initialize weights from checkpoint and override hyperparams.
-        model = SciFactModel.load_from_checkpoint(
+        model = LongCheckerModel.load_from_checkpoint(
             args.starting_checkpoint, hparams=args)
     else:
         # Initialize from scratch.
-        model = SciFactModel(args)
+        model = LongCheckerModel(args)
 
     # Get the appropriate dataset.
     data_module = dm.ConcatDataModule(args)

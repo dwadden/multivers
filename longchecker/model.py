@@ -312,9 +312,15 @@ class LongCheckerModel(pl.LightningModule):
             return optimizer
 
         # Calculate total number of training steps, for the optimizer.
+        if isinstance(hparams.gpus, str):
+            # If gpus is a string, count the number by splitting on commas.
+            n_gpus = len([x for x in hparams.gpus.split(",") if x])
+        else:
+            n_gpus = int(hparams.gpus)
+
         steps_per_epoch = math.ceil(
             hparams.num_training_instances /
-            (hparams.gpus * hparams.train_batch_size * hparams.accumulate_grad_batches))
+            (n_gpus * hparams.train_batch_size * hparams.accumulate_grad_batches))
 
         if hparams.scheduler_total_epochs is not None:
             n_epochs = hparams.scheduler_total_epochs
