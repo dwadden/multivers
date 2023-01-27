@@ -20,6 +20,7 @@ We provide data, model checkpoints, training and inference code for models train
 - [Evaluating predictions](#evaluating-predictions)
 - [Making predictions for new datasets](#making-predictions-for-new-datasets)
 - [Model training](#model-training)
+- [GPT-3 baseline](#gpt-3-baseline)
 
 ## Setup
 
@@ -101,7 +102,11 @@ Once you've got your model and dataset chosen, you can make predictions as follo
         --output_file=[output_path]
 ```
 
-
 ## Model training
 
 Code is now available to train MultiVerS. See [training.md](doc/training.md) for details.
+
+
+## GPT-3 baseline
+
+I've added some code to do very un-optimized few-shot prediction using GPT-3. To run it, do `bash script/predict_gpt3.sh`. For info on the prompt used and the performance achieved, see [gpt3_baseline.md](doc/gpt3_baseline.md).

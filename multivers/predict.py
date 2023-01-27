@@ -30,8 +30,6 @@ def get_args():
 
 
 def get_predictions(args):
-    args = get_args()
-
     # Set up model and data.
     model = MultiVerSModel.load_from_checkpoint(checkpoint_path=args.checkpoint_path)
     # If not predicting NEI, set the model label threshold to 0.

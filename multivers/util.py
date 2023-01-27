@@ -86,3 +86,7 @@ def flatten(z):
     Flatten a nested list.
     """
     return [x for y in z for x in y]
+
+
+def list_to_dict(xs, keyname):
+    return {x[keyname]: x for x in xs}
