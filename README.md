@@ -4,9 +4,9 @@ This is the repository for the MultiVerS model for scientific claim verification
 
 MultiVers was formerly known as LongChecker. It's the exact same model; we just changed the name to emphasize different aspects of the modeling approach. I'm still in the process of changing the filenames within this repo.
 
-**Repository status**: We provide data, model checkpoints, and inference code for models trained on three scientific claim verification datasets: [SciFact](https://github.com/allenai/scifact), [CovidFact](https://github.com/asaakyan/covidfact), and [HealthVer](https://github.com/sarrouti/HealthVer) (see below for details).
+We provide data, model checkpoints, training and inference code for models trained on three scientific claim verification datasets: [SciFact](https://github.com/allenai/scifact), [CovidFact](https://github.com/asaakyan/covidfact), and [HealthVer](https://github.com/sarrouti/HealthVer) (see below for details).  While the SciFact test set is not public, predictions made using the SciFact checkpoint will reproduce the results in the preprint and on the [SciFact leaderboard](https://leaderboard.allenai.org/scifact/submissions/public).
 
-While the SciFact test set is not public, predictions made using the SciFact checkpoint will reproduce the results in the preprint and on the [SciFact leaderboard](https://leaderboard.allenai.org/scifact/submissions/public).
+**Update (January 2023)**: Code and data to train the models are now available. Apologies for the delay.
 
 **Update (May 2022)**: Apologies for the delay in getting the training code up. I will make sure that it is available by the time the work is presented at NAACL 2022, if not sooner.
 
@@ -19,6 +19,7 @@ While the SciFact test set is not public, predictions made using the SciFact che
 - [Model checkpoints](#model-checkpoints)
 - [Evaluating predictions](#evaluating-predictions)
 - [Making predictions for new datasets](#making-predictions-for-new-datasets)
+- [Model training](#model-training)
 
 ## Setup
 
