@@ -56,7 +56,7 @@ def main():
 
     cmd = [
         "python",
-        "longchecker/train.py",
+        "multivers/train.py",
         "--result_dir",
         "checkpoints_user",
         "--datasets",

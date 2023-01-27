@@ -30,7 +30,7 @@ def get_tokenizer():
     return tokenizer
 
 
-class LongCheckerDataset(Dataset):
+class MultiVerSDataset(Dataset):
     "Stores and tensorizes a list of claim / document entries."
 
     def __init__(self, entries, tokenizer):
@@ -172,7 +172,7 @@ class LongCheckerDataset(Dataset):
         return eos_idx[start_ix:].tolist()
 
 
-class LongCheckerReader:
+class MultiVerSReader:
     """
     Class to handle SciFact with retrieved documents.
     """
@@ -205,7 +205,7 @@ class LongCheckerReader:
                          "to_tensorize": to_tensorize}
                 res.append(entry)
 
-        return LongCheckerDataset(res, tokenizer)
+        return MultiVerSDataset(res, tokenizer)
 
 
 class Collator:
@@ -269,7 +269,7 @@ class Collator:
 
 def get_dataloader(predict_args):
     "Main entry point to get the data loader. This can only be used at test time."
-    reader = LongCheckerReader(predict_args)
+    reader = MultiVerSReader(predict_args)
     tokenizer = get_tokenizer()
     ds = reader.get_data(tokenizer)
     collator = Collator(tokenizer)

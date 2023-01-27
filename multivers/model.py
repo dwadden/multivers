@@ -49,7 +49,7 @@ def masked_binary_cross_entropy_with_logits(input, target, weight, rationale_mas
     return final_loss
 
 
-class LongCheckerModel(pl.LightningModule):
+class MultiVerSModel(pl.LightningModule):
     """
     Multi-task SciFact model that encodes claim / abstract pairs using
     Longformer and then predicts rationales and labels in a multi-task fashion.

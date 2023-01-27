@@ -2,7 +2,7 @@ from tqdm import tqdm
 import argparse
 from pathlib import Path
 
-from model import LongCheckerModel
+from model import MultiVerSModel
 from data import get_dataloader
 import util
 
@@ -33,7 +33,7 @@ def get_predictions(args):
     args = get_args()
 
     # Set up model and data.
-    model = LongCheckerModel.load_from_checkpoint(checkpoint_path=args.checkpoint_path)
+    model = MultiVerSModel.load_from_checkpoint(checkpoint_path=args.checkpoint_path)
     # If not predicting NEI, set the model label threshold to 0.
     if args.no_nei:
         model.label_threshold = 0.0

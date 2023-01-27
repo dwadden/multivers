@@ -27,7 +27,7 @@ def main():
         "longformer_large_science",
     ]
     parser = argparse.ArgumentParser(
-        description="Download pretrained Longchecker model"
+        description="Download pretrained MultiVerS model"
     )
     parser.add_argument("name", type=str, choices=choices, help="Model name")
     args = parser.parse_args()

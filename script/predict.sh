@@ -1,7 +1,7 @@
 # Make model predictions.
 
 function predict_scifact() {
-    python longchecker/predict.py \
+    python multivers/predict.py \
         --checkpoint_path=checkpoints/scifact.ckpt \
         --input_file=data/scifact/claims_test_retrieved.jsonl \
         --corpus_file=data/scifact/corpus.jsonl \
@@ -9,7 +9,7 @@ function predict_scifact() {
 }
 
 function predict_healthver() {
-    python longchecker/predict.py \
+    python multivers/predict.py \
         --checkpoint_path=checkpoints/healthver.ckpt \
         --input_file=data/healthver/claims_test.jsonl \
         --corpus_file=data/healthver/corpus.jsonl \
@@ -20,7 +20,7 @@ function predict_covidfact() {
     # NOTE: For covidfact, many of the claims are paper titles (or closely
     # related). To avoid data leakage for this dataset, we evaluate using a
     # version of the corpus with titles removed.
-    python longchecker/predict.py \
+    python multivers/predict.py \
         --checkpoint_path=checkpoints/covidfact.ckpt \
         --input_file=data/covidfact/claims_test.jsonl \
         --corpus_file=data/covidfact/corpus_without_titles.jsonl \

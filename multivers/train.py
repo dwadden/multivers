@@ -11,7 +11,7 @@ from pytorch_lightning.plugins import DDPPlugin
 import argparse
 
 import data_train as dm
-from model import LongCheckerModel
+from model import MultiVerSModel
 
 
 def get_timestamp():
@@ -79,7 +79,7 @@ def parse_args():
     parser.add_argument("--monitor", type=str, default="valid_sentence_label_f1")
     parser.add_argument("--result_dir", type=str, default="results/lightning_logs")
     parser.add_argument("--experiment_name", type=str, default=None)
-    parser = LongCheckerModel.add_model_specific_args(parser)
+    parser = MultiVerSModel.add_model_specific_args(parser)
     parser = dm.ConcatDataModule.add_model_specific_args(parser)
     parser = pl.Trainer.add_argparse_args(parser)
 
@@ -98,11 +98,11 @@ def main():
     # Create the model.
     if args.starting_checkpoint is not None:
         # Initialize weights from checkpoint and override hyperparams.
-        model = LongCheckerModel.load_from_checkpoint(
+        model = MultiVerSModel.load_from_checkpoint(
             args.starting_checkpoint, hparams=args)
     else:
         # Initialize from scratch.
-        model = LongCheckerModel(args)
+        model = MultiVerSModel(args)
 
     # Get the appropriate dataset.
     data_module = dm.ConcatDataModule(args)

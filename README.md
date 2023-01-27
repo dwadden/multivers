@@ -59,7 +59,7 @@ python script/get_checkpoint.py longformer_large_science
   bash script/predict.sh scifact
   ```
 
-- For more control over the models and datasets used for prediction, you can use [longchecker/predict.py](longchecker/predict.py).
+- For more control over the models and datasets used for prediction, you can use [multivers/predict.py](multivers/predict.py).
 
 ## Model checkpoints
 
@@ -78,7 +78,7 @@ You can also download all models by passing `all` to `get_checkpoint.sh`.
 
 The SciFact test set is private, but the test sets for HealthVer and CovidFact are included in the data download. To evaluate model predictions, use the [scifact-evaluator](https://github.com/allenai/scifact-evaluator) code. Clone the repo, then use the [evaluation script](https://github.com/allenai/scifact-evaluator/blob/master/evaluator/eval.py) located at `evaluator/eval.py`. This script accepts two files:
 
-1. Predictions, as output by `longchecker/predict.py`
+1. Predictions, as output by `multivers/predict.py`
 2. Gold labels, which are included in the data download.
 
 It will evaluate the predictions with respect to gold and save metrics to a file. See the evaluation script for more details.
@@ -94,7 +94,7 @@ You should be able to use one of the MultiVers checkpoints to make predictions f
 Once you've got your model and dataset chosen, you can make predictions as follows:
 
 ```bash
-    python longchecker/predict.py \
+    python multivers/predict.py \
         --checkpoint_path=checkpoints/[model_name].ckpt \
         --input_file=[path_to_your_claims] \
         --corpus_file=[path_to_your_corpus] \
