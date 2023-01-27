@@ -5,7 +5,7 @@ MultiVerS training as described in the [paper](https://arxiv.org/abs/2112.01640)
 1. Pretraining on out-of-domain data (FEVER) + weakly-labeled in-domain data (PubMedQA + Evidence Inference).
 2. Finetuning on a target dataset: one of SciFact, HealthVer, or CovidFact.
 
-Data and code are now available to do both stages of training. In practice, Stage 1 training is quite expensive (FEVER is big), so unless you have a lot of GPUs to burn, it's probably not worth doing it yourself. Instead, download the `fever_sci` checkpoint using [get_checkpoint.py](script/get_checkpoint.py); this model is the output of Stage 1 training and is a good starting point for developing models for a new target dataset.
+Data and code are now available to do both stages of training. In practice, Stage 1 training is quite expensive (FEVER is big), so unless you have a lot of GPUs to burn, it's probably not worth doing it yourself. Instead, download the `fever_sci` checkpoint using [get_checkpoint.py](http://github.com/dwadden/multivers/tree/main/script/get_checkpoint.py); this model is the output of Stage 1 training and is a good starting point for developing models for a new target dataset.
 
 ## Outline
 
@@ -27,9 +27,9 @@ I haven't released the data preprocessing code to convert these datasets from th
 
 ## Training
 
-- To pretrain (Stage 1 training), use [pretrain.py](script/pretrain.py).
+- To pretrain (Stage 1 training), use [pretrain.py](http://github.com/dwadden/multivers/tree/main/script/pretrain.py).
   Example usage: `python script/pretrain.py --datasets fever,pubmedqa,evidence_inference`
-- To finetune (Stage 2 training), use [train_target.py](script/train_target.py).
+- To finetune (Stage 2 training), use [train_target.py](http://github.com/dwadden/multivers/tree/main/script/train_target.py).
   Example usage: `python script/train_target.py --dataset scifact_20`
 
 For both scripts, the trained model will go in a directory named `checkpoints_user`. Note that `train_target.py` task a single target `dataset` as input, while `pretrain.py` takes multiple target `datasets`, separated by commas.
