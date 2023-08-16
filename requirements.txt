@@ -13,5 +13,4 @@ torch==1.7.1
 torchvision==0.8.2
 tqdm==4.49
 transformers==4.2.2
-gdown==4.5.4
 openai==0.26.4

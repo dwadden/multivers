@@ -1,5 +1,5 @@
 # Download processed versions of target datasets.
 
-gdown https://drive.google.com/uc?id=1uqehbrsMEez0jrUnu_4d12D4BBaHCKcm
+wget "https://scifact.s3.us-west-2.amazonaws.com/longchecker/latest/data.tar.gz"
 tar -xf data.tar.gz
 rm data.tar.gz
